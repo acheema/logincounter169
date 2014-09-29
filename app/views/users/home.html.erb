@@ -71,7 +71,12 @@ function success_page(user, count) {
    $('#home_login').hide();
    $('#success_page').show();
    $('#logged_in_message').hide();
-   $('#logged_in_message').html("Welcome "+user+". You have logged in "+count+" times.");
+   if(count == 1){
+      $('#logged_in_message').html("Welcome "+user+". You have logged in "+count+" time.");
+   }
+   else{
+      $('#logged_in_message').html("Welcome "+user+". You have logged in "+count+" times.");
+   }
    $('#logged_in_message').fadeIn("slow");
    $('#kappa').fadeIn("8000");
 }
