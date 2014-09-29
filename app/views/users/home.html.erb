@@ -7,7 +7,16 @@
 
   <style>
   #home-page{
-    padding:250px;
+    padding:200px;
+  }
+  body{
+    background-color: Gainsboro ;
+  }
+  #msg{
+    font-size: 16px;
+  }
+  #kappa{
+    padding: 20px;
   }
   </style>
 </head>
@@ -35,18 +44,20 @@
     </form>
   </center>
 </div>
+<div id="kappa"><img src="http://static.giantbomb.com/uploads/original/1/18175/2169924-kappa.png" alt="keepo" height="130" width="96"></div>
 </center>
 <div>
 
 <script type="text/javascript">
 
 $(document).ready(function() {
-   home_page("Please sign in or create a new user")
+   home_page("Please enter your credentials below")
  });
 
 function home_page(message) {
   if(! message) message = "Please enter your credentials below";
   $('#success_page').hide()
+  $('#kappa').hide()
   $('#username_field').val()
   $('#pass_field').val()
   $('#home_login').show()
@@ -62,7 +73,36 @@ function success_page(user, count) {
    $('#logged_in_message').hide();
    $('#logged_in_message').html("Welcome "+user+". You have logged in "+count+" times.");
    $('#logged_in_message').fadeIn("slow");
+   $('#kappa').fadeIn("8000");
 }
+
+$('#login_button').click(function() {
+   username = $('#username_field').val()
+   password = $('#pass_field').val()
+   $.ajax({
+        type: 'POST',
+        url: "/users/login",
+        data: JSON.stringify({ user: username, password: password }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return handle_login_response(data, username); },
+    });
+   return false;
+});
+
+$('#add_button').click(function() {
+   username = $('#username_field').val()
+   password = $('#pass_field').val()
+   $.ajax({
+        type: 'POST',
+        url: "/users/add",
+        data: JSON.stringify({ user: username, password: password }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return handle_add_user_response(data, username); },
+    });
+   return false;
+});
 
 function handle_login_response(data, user) {
   if( data.errCode > 0 ) {
@@ -82,37 +122,10 @@ function handle_add_user_response(data, user) {
   }
 }
 
-$('#login_button').click(function() {
-   username = $('#username_field').val()
-   password = $('#pass_field').val()
-   json_request("/users/login", { user: username, password: password },
-		function(data) { return handle_login_response(data, username); });
-   return false;
-});
-
-$('#add_button').click(function() {
-   username = $('#username_field').val()
-   password = $('#pass_field').val()
-   json_request("/users/add", { user: username, password: password },
-		function(data) { return handle_add_user_response(data, username); });
-   return false;
-});
-
 $('#logout-button').click(function() {
   home_page();
   return false;
 });
-
-function json_request(page, dict, success) {
-    $.ajax({
-        type: 'POST',
-        url: page,
-        data: JSON.stringify(dict),
-        contentType: "application/json",
-        dataType: "json",
-        success: success,
-    });
-}
 
 function errorcode_message(code) {
 	if( code == (-3)) {
