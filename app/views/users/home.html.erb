@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login Counter</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+  <style>
+  #home-page{
+    padding:250px;
+  }
+  </style>
+</head>
+<body>
+
+<div id="home-page">
+<center>
+<div id="home_login" class="box">
+  <div id="msg" class="message"></div>
+  <center>
+    <form>
+      <input type="text" name="username" id="username_field" placeholder="Username"><br>
+      <input type="password" name="pwd" id="pass_field" placeholder="Password"><br>
+      <input type="submit" id="login_button" value="Login">
+      <input type="submit" id="add_button" value="Add User">
+    </form>
+  </center>
+</div>
+
+<div id="success_page" class="box">
+  <div id="logged_in_message" class="message"></div>
+  <center>
+    <form>
+      <input type="submit" id="logout-button" value="Logout">
+    </form>
+  </center>
+</div>
+</center>
+<div>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+   home_page("Please sign in or create a new user")
+ });
+
+function home_page(message) {
+  if(! message) message = "Please enter your credentials below";
+  $('#success_page').hide()
+  $('#username_field').val()
+  $('#pass_field').val()
+  $('#home_login').show()
+  $('#msg').hide()
+  $('#msg').html(message)
+  $('#msg').fadeIn("slow")
+  
+}
+
+function success_page(user, count) {
+   $('#home_login').hide();
+   $('#success_page').show();
+   $('#logged_in_message').hide();
+   $('#logged_in_message').html("Welcome "+user+". You have logged in "+count+" times.");
+   $('#logged_in_message').fadeIn("slow");
+}
+
+function handle_login_response(data, user) {
+  if( data.errCode > 0 ) {
+     c = data.count;
+     success_page(user, c);
+  } else {
+     home_page(errorcode_message(data.errCode));  
+  }
+}
+
+function handle_add_user_response(data, user) {
+  if( data.errCode > 0 ) {
+     c = data.count;
+     success_page(user, c);
+  } else {
+     home_page(errorcode_message(data.errCode));  
+  }
+}
+
+$('#login_button').click(function() {
+   username = $('#username_field').val()
+   password = $('#pass_field').val()
+   json_request("/users/login", { user: username, password: password },
+		function(data) { return handle_login_response(data, username); });
+   return false;
+});
+
+$('#add_button').click(function() {
+   username = $('#username_field').val()
+   password = $('#pass_field').val()
+   json_request("/users/add", { user: username, password: password },
+		function(data) { return handle_add_user_response(data, username); });
+   return false;
+});
+
+$('#logout-button').click(function() {
+  home_page();
+  return false;
+});
+
+function json_request(page, dict, success) {
+    $.ajax({
+        type: 'POST',
+        url: page,
+        data: JSON.stringify(dict),
+        contentType: "application/json",
+        dataType: "json",
+        success: success,
+    });
+}
+
+function errorcode_message(code) {
+	if( code == (-3)) {
+        return ("The user name should be non-empty and at most 128 characters long. Please try again.");
+    } else if( code == (-2)) {
+        return ("This username already exists. Please try again.");
+    } else if( code == (-4)) {
+        return ("The password should be at most 128 characters long. Please try again.");
+    } else {
+		return ("Invalid username and password combination. Please try again.");
+   }
+}
+
+</script>
+
+</body>
+</html>

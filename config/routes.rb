@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
+  root 'users#home'
   post "TESTAPI/resetFixture" => "testapi#resetFixture"
   post "TESTAPI/unitTests"    => "testapi#unitTests"
-  post "users/add"
-  post "users/login"
+  post "users/add"            => "users#add"
+  post "users/login"          => "users#login"
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
